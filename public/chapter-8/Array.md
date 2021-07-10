@@ -1,9 +1,8 @@
 ---
-author: default
+title: Array
+author: Therainisme
 chapter: 集合引用类型
 ---
-
-# Array
 
 ## 问题描述
 

@@ -12,11 +12,24 @@ function Article() {
         const loading = async () => {
             const text = await axios.get('./chapter-8/Array.md');
             // todo get title, author, and chapter
-            setTitle("Array");
-            setAuthor("Therainisme");
-            setChapter("集合引用类型");
+            const string: string = text.data;
+            const info = string.split('---')[1];
+            const infoArray = info.split('\r\n');
+            const infoObject = {} as any;
+            const keyArray = ["author", "chapter", "title"];
+            infoArray.forEach(x => {
+                const keyValue = x.split(':');
+                const key = keyValue[0];
+                if (keyArray.includes(key)) {
+                    infoObject[key] = keyValue[1].trim();
+                }
+            })
+
+            setTitle(infoObject.title);
+            setAuthor(infoObject.author);
+            setChapter(infoObject.chapter);
             // todo end
-            const html = MarkdownParser.render(text.data);
+            const html = MarkdownParser.render(text.data.replace(`---${info}---`, ''));
             setContent(html)
         }
 
