@@ -1,44 +1,39 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import MarkdownParser from "../../utlis/markdown-utlis";
+import MarkdownUtlis from "../../utlis/markdown-utlis";
 
 function Article() {
     const [content, setContent] = useState<string>(null!);
     const [title, setTitle] = useState<string>();
     const [author, setAuthor] = useState<string>();
     const [chapter, setChapter] = useState<string>();
+    const [testScript, setTestScript] = useState<string>(null!);
 
     useEffect(() => {
         const loading = async () => {
             const text = await axios.get('./chapter-8/Array.md');
-            // todo get title, author, and chapter
-            const string: string = text.data;
-            const info = string.split('---')[1];
-            const infoArray = info.split('\r\n');
-            const infoObject = {} as any;
-            const keyArray = ["author", "chapter", "title"];
-            infoArray.forEach(x => {
-                const keyValue = x.split(':');
-                const key = keyValue[0];
-                if (keyArray.includes(key)) {
-                    infoObject[key] = keyValue[1].trim();
-                }
-            })
 
-            setTitle(infoObject.title);
-            setAuthor(infoObject.author);
-            setChapter(infoObject.chapter);
-            // todo end
-            const html = MarkdownParser.render(text.data.replace(`---${info}---`, ''));
-            setContent(html)
+            const parseRes = MarkdownUtlis.parse(text.data);
+
+            console.log(parseRes);
+
+            setTitle(parseRes.title);
+            setAuthor(parseRes.author);
+            setChapter(parseRes.chapter);
+            setContent(parseRes.html);
+            setTestScript(parseRes.testScript);
         }
 
         loading();
     }, []);
 
+    const handleOnTest = () => {
+        eval(testScript);
+    }
+
     return (
         <section className="article-clean"
-            style={{ fontFamily: "font-family: -apple-system,BlinkMacSystemFont,Noto Sans CJK SC,Arial,Helvetica Neue!important;" }}
+            style={{ fontFamily: "-apple-system,BlinkMacSystemFont,Noto Sans CJK SC,Arial,Helvetica Neue !important;" }}
         >
             <div className="container">
                 <div className="row">
@@ -54,7 +49,11 @@ function Article() {
                         <div className="text" dangerouslySetInnerHTML={{ __html: content }}>
                         </div>
                         <textarea style={{ width: "100%", height: 300 }}></textarea>
-                        <button className="btn btn-primary" type="button">测试
+                        <button
+                            className="btn btn-primary"
+                            type="button"
+                            onClick={e => handleOnTest()}>
+                            测试
                         </button>
 
                         <button className="btn btn-success" type="button" style={{ margin: 10 }}>查看答案</button>

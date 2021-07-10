@@ -23,3 +23,7 @@ Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia
 ## 期待的结果
 
 Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae. Suspendisse vel placerat ligula. Vivamus ac sem lac. Ut vehicula rhoncus elementum. Etiam quis tristique lectus. Aliquam in arcu eget velit pulvinar dictum vel in justo.
+
+<script test>
+    console.log("helloWord!");
+</script>
