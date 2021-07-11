@@ -37,7 +37,6 @@ function parse(target: string) {
         }
     })
     const testString = target.match(/<script(([\s\S])*?)<\/script>/g);
-    console.log(testString);
     const testScript = testString![0]
         .replace("<script test>", "")
         .replace("</script>", "")
