@@ -2,10 +2,14 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import MarkdownUtlis from "../../utlis/markdown-utlis";
 import { UnControlled as CodeMirror } from 'react-codemirror2'
+import 'highlight.js/styles/vs.css';
+import './code.css';
 import 'codemirror/lib/codemirror.css';
-const theme = "neo";
+
 import 'codemirror/theme/neo.css';
 import 'codemirror/addon/hint/show-hint.css';
+
+import style from './index.module.scss';
 
 // todo hint addon
 import 'codemirror/mode/javascript/javascript';
@@ -13,39 +17,45 @@ import 'codemirror/addon/hint/javascript-hint';
 import 'codemirror/addon/edit/matchbrackets';
 
 
-const defaultInput = `class Name {
-    fun(){
-        console.log("Hello World");
-    }
-}`
-
 function Article() {
     const [content, setContent] = useState<string>(null!);
     const [title, setTitle] = useState<string>();
     const [author, setAuthor] = useState<string>();
     const [chapter, setChapter] = useState<string>();
     const [testScript, setTestScript] = useState<string>(null!);
+    let [inputScript, setInputScript] = useState<string>(null!);
 
     useEffect(() => {
         const loading = async () => {
             const text = await axios.get('./chapter-8/Array.md');
-
             const parseRes = MarkdownUtlis.parse(text.data);
-
-            console.log(parseRes);
 
             setTitle(parseRes.title);
             setAuthor(parseRes.author);
             setChapter(parseRes.chapter);
             setContent(parseRes.html);
-            setTestScript(parseRes.testScript);
+            setTestScript(parseRes.script.test);
+            setInputScript(parseRes.script.template);
         }
 
         loading();
     }, []);
 
+    const [resultMsg, setResultMsg] = useState<string>("");
+    const [testTime, setTestTime] = useState<string>(new Date().toString());
     const handleOnTest = () => {
-        eval(testScript);
+        try {
+            const testResult = eval(inputScript + '\r\n' + testScript);
+            if (testResult === true && typeof testResult === "boolean") {
+                setResultMsg("Success!");
+            } else if (testResult === false && typeof testResult === "boolean") {
+                setResultMsg("Wrong!");
+            }
+        } catch (e) {
+            setResultMsg("Unexpected error!");
+        }
+        setTestTime(new Date().toString());
+        setInputScript(inputScript);
     }
 
     return (
@@ -65,21 +75,19 @@ function Article() {
                         </div>
                         <div className="text" dangerouslySetInnerHTML={{ __html: content }}>
                         </div>
-                        {/* <textarea style={{ width: "100%", height: 300 }}>
-
-                        </textarea> */}
                         <CodeMirror
-                            value={defaultInput}
+                            className={style.codemirror}
+                            value={inputScript}
                             options={{
                                 mode: "javascript",
-                                theme,
+                                theme: "neo",
                                 lineNumbers: true,
                                 indentUnit: 4,
                                 inputStyle: "contenteditable",
-                                matchBrackets: true,
+                                matchBrackets: true
                             }}
                             onChange={(editor, data, value) => {
-                                console.log(value);
+                                inputScript = value;
                             }}
                         />
                         <button
@@ -90,6 +98,12 @@ function Article() {
                         </button>
 
                         <button className="btn btn-success" type="button" style={{ margin: 10 }}>查看答案</button>
+                        {resultMsg ?
+                            <div className={`alert ${resultMsg === "Success!" ? "alert-success" : "alert-danger"}`} role="alert">
+                                <p><strong>{testTime}</strong></p>
+                                <span>{resultMsg}</span>
+                            </div> : ''
+                        }
                     </div>
                 </div>
             </div>
