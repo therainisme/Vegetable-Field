@@ -27,7 +27,6 @@ function NavBarItem() {
 
     return (
         <li className={`nav-item dropdown ${show ? "show" : ""}`}
-            // onFocus={e => setShow(true)}
             onBlur={e => setShow(false)}
             onClick={e => handleOnClick()}
         >

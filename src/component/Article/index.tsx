@@ -11,11 +11,11 @@ import 'codemirror/addon/hint/show-hint.css';
 
 import style from './index.module.scss';
 
-// todo hint addon
+import 'codemirror/addon/hint/show-hint';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/hint/javascript-hint';
 import 'codemirror/addon/edit/matchbrackets';
-
+import 'codemirror/addon/edit/closebrackets';
 
 function Article() {
     const [content, setContent] = useState<string>(null!);
@@ -75,21 +75,27 @@ function Article() {
                         </div>
                         <div className="text" dangerouslySetInnerHTML={{ __html: content }}>
                         </div>
-                        <CodeMirror
-                            className={style.codemirror}
-                            value={inputScript}
-                            options={{
-                                mode: "javascript",
-                                theme: "neo",
-                                lineNumbers: true,
-                                indentUnit: 4,
-                                inputStyle: "contenteditable",
-                                matchBrackets: true
-                            }}
-                            onChange={(editor, data, value) => {
-                                inputScript = value;
-                            }}
-                        />
+                        <div className={style.codeinputCard}>
+                            <CodeMirror
+                                className={style.codemirror}
+                                value={inputScript}
+                                options={{
+                                    mode: "javascript",
+                                    theme: "neo",
+                                    lineNumbers: true,
+                                    indentUnit: 4,
+                                    inputStyle: "contenteditable",
+                                    matchBrackets: true,
+                                    autoCloseBrackets: true,
+                                    extraKeys: {
+                                        "Ctrl-Space": "autocomplete"
+                                    },
+                                }}
+                                onChange={(editor, data, value) => {
+                                    inputScript = value;
+                                }}
+                            />
+                        </div>
                         <button
                             className="btn btn-primary"
                             type="button"
@@ -97,7 +103,8 @@ function Article() {
                             测试
                         </button>
 
-                        <button className="btn btn-success" type="button" style={{ margin: 10 }}>查看答案</button>
+                        <button className="btn btn-success" type="button" style={{ margin: 20 }}>查看答案</button>
+
                         {resultMsg ?
                             <div className={`alert ${resultMsg === "Success!" ? "alert-success" : "alert-danger"}`} role="alert">
                                 <p><strong>{testTime}</strong></p>
