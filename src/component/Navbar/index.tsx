@@ -3,7 +3,7 @@ import axios from 'axios';
 import { NavLink } from 'react-router-dom';
 
 function NavBar() {
-    const [chatperData, setChatperData] = useState<({ title: string, url: string }[])>();
+    const [chatperData, setChatperData] = useState<({ title: string, url: string }[])>([]);
     useEffect(() => {
         axios.get('/chapter-data.json')
             .then((res) => {

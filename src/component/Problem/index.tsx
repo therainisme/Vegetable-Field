@@ -21,9 +21,9 @@ import { requestUrlToFileUrl } from "../../utlis";
 
 function Problem({ location }: any) {
     const [content, setContent] = useState<string>(null!);
-    const [title, setTitle] = useState<string>();
-    const [author, setAuthor] = useState<string>();
-    const [chapter, setChapter] = useState<string>();
+    const [title, setTitle] = useState<string>(null!);
+    const [author, setAuthor] = useState<string>(null!);
+    const [chapter, setChapter] = useState<string>(null!);
     const [testScript, setTestScript] = useState<string>(null!);
     let [inputScript, setInputScript] = useState<string>(null!);
 
