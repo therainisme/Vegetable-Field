@@ -24,5 +24,5 @@ ReactDOM.render(
   document.getElementById('root')
 )
 
-// import './assets/js/jquery.min.js';
-// import './assets/bootstrap/js/bootstrap.min.js';
+import './assets/js/jquery.min.js';
+import './assets/bootstrap/js/bootstrap.min.js';
