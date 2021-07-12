@@ -41,7 +41,7 @@ function Hello() {
                             </div>
                             <div className="col-sm-6 col-lg-4 item">
                                 <h3 className="name">几乎零延迟的测评</h3>
-                                <p className="description">因为是跑在自己浏览器上的哈哈哈哈哈哈哈，所以根本不会和服务器交互。跨站脚本攻击什么的，不存在。</p>
+                                <p className="description">因为是跑在自己浏览器上的哈哈哈哈哈哈，所以根本不会和服务器交互。跨站脚本攻击什么的，不存在。</p>
                             </div>
                             <div className="col-sm-6 col-lg-4 item">
                                 <h3 className="name">暴力美学</h3>
