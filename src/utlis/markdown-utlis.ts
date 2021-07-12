@@ -29,10 +29,10 @@ export interface Content {
 export function parse(target: string) {
 
     const info = target.split('---')[1];
-    const infoArray = info.split('\r\n');
+    const infoArray = info.split(/\r?\n/);
     const infoObject = {} as any;
     const keyArray = ["author", "chapter", "title"];
-    console.log(info);
+    console.log({target, info});
     infoArray.forEach(x => {
         const keyValue = x.split(':');
         const key = keyValue[0];
@@ -40,6 +40,7 @@ export function parse(target: string) {
             infoObject[key] = keyValue[1].trim();
         }
     })
+    console.log({target, info, infoArray});
 
     const testScript = getScriptByType(target, "test");
     const templateScript = getScriptByType(target, "template");
