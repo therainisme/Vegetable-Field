@@ -27,9 +27,9 @@ export interface Content {
 }
 
 export function parse(target: string) {
-    // todo get title, author, and chapter
+
     const info = target.split('---')[1];
-    const infoArray = info.split('\r\n');
+    const infoArray = info.split(/\r?\n/);
     const infoObject = {} as any;
     const keyArray = ["author", "chapter", "title"];
     infoArray.forEach(x => {
@@ -56,7 +56,7 @@ export function parse(target: string) {
         answer: answerScript,
         define: defineScript
     }
-    // todo end
+
     return infoObject as Content;
 }
 

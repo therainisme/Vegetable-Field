@@ -21,10 +21,6 @@ function loaderMarkdownFiles(dir: string) {
     });
 }
 
-
-
-
-
 const ChapterLoader = {
     run
 }

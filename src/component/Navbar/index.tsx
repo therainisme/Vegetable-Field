@@ -3,10 +3,11 @@ import axios from 'axios';
 import { NavLink } from 'react-router-dom';
 
 function NavBar() {
-    const [chatperData, setChatperData] = useState<({ title: string, url: string }[])>();
+    const [chatperData, setChatperData] = useState<({ title: string, url: string }[])>([]);
     useEffect(() => {
         axios.get('/chapter-data.json')
             .then((res) => {
+                console.info(res.data);
                 setChatperData(res.data);
             })
     }, []);
@@ -50,11 +51,6 @@ function NavBarItem({ chapter, articles }: { chapter: string, articles: { title:
             </a>
             <div className="dropdown-menu">
                 {articles.map(x => {
-                    // return <a key={x.title}
-                    //     className="dropdown-item"
-                    //     href={x.requestUrl}>
-                    //     {x.title}
-                    // </a>;
                     return (
                         <NavLink
                             key={x.title}
