@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from 'axios';
+import { NavLink } from 'react-router-dom';
 
 function NavBar() {
     const [chatperData, setChatperData] = useState<({ title: string, url: string }[])>();
@@ -29,7 +30,7 @@ function NavBar() {
     )
 }
 
-function NavBarItem({ chapter, articles }: { chapter: string, articles: { title: string, url: string }[] }) {
+function NavBarItem({ chapter, articles }: { chapter: string, articles: { title: string, requestUrl: string }[] }) {
 
     return (
         <li className="nav-item dropdown"
@@ -42,11 +43,20 @@ function NavBarItem({ chapter, articles }: { chapter: string, articles: { title:
             </a>
             <div className="dropdown-menu">
                 {articles.map(x => {
-                    return <a key={x.title}
-                        className="dropdown-item"
-                        href={x.url}>
-                        {x.title}
-                    </a>;
+                    // return <a key={x.title}
+                    //     className="dropdown-item"
+                    //     href={x.requestUrl}>
+                    //     {x.title}
+                    // </a>;
+                    return (
+                        <NavLink
+                            key={x.title}
+                            className="dropdown-item"
+                            to={{ pathname: x.requestUrl }}
+                        >
+                            {x.title}
+                        </NavLink>
+                    )
                 })}
             </div>
         </li>

@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
+import { BrowserRouter } from 'react-router-dom';
+
 
 import './assets/bootstrap/css/bootstrap.min.css';
 import './assets/fonts/ionicons.min.css';
@@ -10,9 +12,9 @@ import './assets/css/Navigation-with-Button.css';
 import './assets/css/styles.css';
 
 ReactDOM.render(
-  <React.StrictMode>
+  <BrowserRouter>
     <App />
-  </React.StrictMode>,
+  </BrowserRouter>,
   document.getElementById('root')
 )
 

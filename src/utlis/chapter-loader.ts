@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from "path";
+import { fileUrlToRequestUrl } from '.';
 import MarkdownUtlis from './markdown-utlis';
 
 function run(path: string) {
@@ -7,9 +8,10 @@ function run(path: string) {
     return files.map(x => {
         const text = fs.readFileSync(path + x, 'utf8');
         const parseRes = MarkdownUtlis.parse(text);
-        const url = '/' + path + x;
+        const fileUrl = ('/' + path + x).replace("/public", "");
+        const requestUrl = fileUrlToRequestUrl(fileUrl);
         const title = parseRes.title;
-        return { title, url };
+        return { title, fileUrl, requestUrl };
     })
 }
 
@@ -18,6 +20,10 @@ function loaderMarkdownFiles(dir: string) {
         return !fs.statSync(path.join(dir, self)).isDirectory()
     });
 }
+
+
+
+
 
 const ChapterLoader = {
     run

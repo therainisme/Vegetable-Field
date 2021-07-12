@@ -17,7 +17,9 @@ import 'codemirror/addon/hint/javascript-hint';
 import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/edit/closebrackets';
 
-function Article() {
+import { requestUrlToFileUrl } from "../../utlis";
+
+function Article({ location }: any) {
     const [content, setContent] = useState<string>(null!);
     const [title, setTitle] = useState<string>();
     const [author, setAuthor] = useState<string>();
@@ -27,7 +29,7 @@ function Article() {
 
     useEffect(() => {
         const loading = async () => {
-            const text = await axios.get('./magic/1.md');
+            const text = await axios.get(requestUrlToFileUrl(location.pathname));
             const parseRes = MarkdownUtlis.parse(text.data);
 
             setTitle(parseRes.title);
@@ -39,7 +41,7 @@ function Article() {
         }
 
         loading();
-    }, []);
+    }, [location.pathname]);
 
     const [resultMsg, setResultMsg] = useState<string>("");
     const [testTime, setTestTime] = useState<string>(new Date().toString());
@@ -59,8 +61,7 @@ function Article() {
     }
 
     return (
-        <section className="article-clean"
-            style={{ fontFamily: "-apple-system,BlinkMacSystemFont,Noto Sans CJK SC,Arial,Helvetica Neue !important;" }}
+        <section className={`article-clean ${style.article}`}
         >
             <div className="container">
                 <div className="row">
@@ -119,3 +120,4 @@ function Article() {
 }
 
 export default Article;
+
