@@ -104,7 +104,7 @@ function Problem({ location }: any) {
                             测试
                         </button>
 
-                        <button className="btn btn-success" type="button" style={{ margin: 20 }}>查看答案</button>
+                        <button className="btn btn-success" type="button" data-toggle="modal" data-target="#staticBackdrop" style={{ margin: 20 }}>查看答案</button>
 
                         {resultMsg ?
                             <div className={`alert ${resultMsg === "Success!" ? "alert-success" : "alert-danger"}`} role="alert">
@@ -112,6 +112,25 @@ function Problem({ location }: any) {
                                 <span>{resultMsg}</span>
                             </div> : ''
                         }
+
+                        <div className="modal fade" id="staticBackdrop" data-keyboard="false" tabIndex={"-1" as any} aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                            <div className="modal-dialog modal-dialog-centered">
+                                <div className="modal-content">
+                                    <div className="modal-header">
+                                        <h5 className="modal-title" id="staticBackdropLabel">参考答案</h5>
+                                        <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div className="modal-body">
+                                        懒到家了哈哈哈哈哈哈，根本不想写答案！
+                                    </div>
+                                    <div className="modal-footer">
+                                        <button type="button" className="btn btn-success" data-dismiss="modal">好的我明白</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
