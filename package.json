@@ -1,14 +1,14 @@
 {
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite --host",
+    "dev": "npm run create-navbar && vite --host",
     "build": "tsc && vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "create-navbar": "ts-node ./script/create-navbar-json.ts"
   },
   "dependencies": {
     "@types/axios": "^0.14.0",
     "@types/markdown-it": "^12.0.3",
-    "@types/node": "^12.0.0",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@types/react-redux": "^7.1.16",
@@ -17,6 +17,7 @@
     "codemirror": "^5.62.0",
     "highlight.js": "^11.1.0",
     "markdown-it": "^12.1.0",
+    "path": "^0.12.7",
     "react": "^17.0.0",
     "react-codemirror2": "^7.2.1",
     "react-dom": "^17.0.0",
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@types/codemirror": "^5.60.2",
+    "@types/node": "^12.20.16",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@vitejs/plugin-react-refresh": "^1.3.1",

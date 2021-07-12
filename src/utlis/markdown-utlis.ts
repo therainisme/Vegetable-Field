@@ -1,7 +1,8 @@
 
 import MarkdownIt from 'markdown-it';
 import hljs from 'highlight.js';
-const MDIT = new MarkdownIt({
+
+export const MDIT = new MarkdownIt({
     highlight: function (str: string, lang: string) {
         try {
             return '<pre class="code-block"><code>' +
@@ -23,7 +24,7 @@ export interface Content {
     }
 }
 
-function parse(target: string) {
+export function parse(target: string) {
     // todo get title, author, and chapter
     const info = target.split('---')[1];
     const infoArray = info.split('\r\n');
@@ -58,7 +59,7 @@ function parse(target: string) {
     return infoObject as Content;
 }
 
-const MarkdownUtlis = {
+export const MarkdownUtlis = {
     parse
 }
 

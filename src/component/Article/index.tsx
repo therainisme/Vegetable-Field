@@ -27,7 +27,7 @@ function Article() {
 
     useEffect(() => {
         const loading = async () => {
-            const text = await axios.get('./chapter-8/Array.md');
+            const text = await axios.get('./magic/1.md');
             const parseRes = MarkdownUtlis.parse(text.data);
 
             setTitle(parseRes.title);
