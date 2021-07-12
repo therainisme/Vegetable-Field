@@ -21,6 +21,8 @@ export interface Content {
     script: {
         test: string,
         template: string,
+        define: string,
+        answer: string
     }
 }
 
@@ -37,15 +39,12 @@ export function parse(target: string) {
             infoObject[key] = keyValue[1].trim();
         }
     })
-    const testString = target.match(/<script(([\s\S])*?)<\/script>/g);
-    const testScript = testString![0]
-        .replace("<script test>", "")
-        .replace("</script>", "")
-        .trim();
-    const templateScript = testString![1]
-        .replace("<script template>", "")
-        .replace("</script>", "")
-        .trim();
+
+    const testScript = getScriptByType(target, "test");
+    const templateScript = getScriptByType(target, "template");
+    const answerScript = getScriptByType(target, "answer");
+    const defineScript = getScriptByType(target, "define");
+
     const html = MDIT.render(target
         .replace(`---${info}---`, "")
         .replace(/<script(([\s\S])*?)<\/script>/g, "")
@@ -53,10 +52,26 @@ export function parse(target: string) {
     infoObject.html = html;
     infoObject.script = {
         test: testScript,
-        template: templateScript
+        template: templateScript,
+        answer: answerScript,
+        define: defineScript
     }
     // todo end
     return infoObject as Content;
+}
+
+type ScriptType = "test" | "template" | "answer" | "define";
+
+function getScriptByType(target: string, type: ScriptType) {
+    const regExp = new RegExp(`<script ${type}(([\\s\\S])*?)<\/script>`, "g");
+    const matchArray = target.match(regExp);
+    if (matchArray && matchArray?.length > 0) {
+        return matchArray[0]
+            .replace(`<script ${type}>`, "")
+            .replace("</script>", "")
+            .trim();
+    }
+    return null;
 }
 
 export const MarkdownUtlis = {
