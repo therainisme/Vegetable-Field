@@ -19,7 +19,7 @@ import 'codemirror/addon/edit/closebrackets';
 
 import { requestUrlToFileUrl } from "../../utlis";
 
-function Article({ location }: any) {
+function Problem({ location }: any) {
     const [content, setContent] = useState<string>(null!);
     const [title, setTitle] = useState<string>();
     const [author, setAuthor] = useState<string>();
@@ -119,5 +119,5 @@ function Article({ location }: any) {
     )
 }
 
-export default Article;
+export default Problem;
 
