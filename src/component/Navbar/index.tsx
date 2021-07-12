@@ -7,6 +7,7 @@ function NavBar() {
     useEffect(() => {
         axios.get('/chapter-data.json')
             .then((res) => {
+                console.log(res.data);
                 setChatperData(res.data);
             })
     }, []);
@@ -50,11 +51,6 @@ function NavBarItem({ chapter, articles }: { chapter: string, articles: { title:
             </a>
             <div className="dropdown-menu">
                 {articles.map(x => {
-                    // return <a key={x.title}
-                    //     className="dropdown-item"
-                    //     href={x.requestUrl}>
-                    //     {x.title}
-                    // </a>;
                     return (
                         <NavLink
                             key={x.title}
