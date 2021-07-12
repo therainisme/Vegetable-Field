@@ -13,7 +13,14 @@ function NavBar() {
 
     return (
         <nav className="navbar navbar-light navbar-expand-md navigation-clean-button">
-            <div className="container"><a className="navbar-brand" href="#">Vegetable Field</a><button data-toggle="collapse" className="navbar-toggler" data-target="#navcol-1"><span className="sr-only">Toggle navigation</span><span className="navbar-toggler-icon"></span></button>
+            <div className="container">
+                <NavLink className="navbar-brand" to={{pathname: "/"}}>
+                    Vegetable Field
+                </NavLink>
+                <button data-toggle="collapse" className="navbar-toggler" data-target="#navcol-1">
+                    <span className="sr-only">Toggle navigation</span>
+                    <span className="navbar-toggler-icon"></span>
+                </button>
                 <div className="collapse navbar-collapse" id="navcol-1">
                     <ul className="navbar-nav mr-auto">
                         {chatperData?.map(x => {
