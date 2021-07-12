@@ -2,7 +2,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "npm run create-navbar && vite --host",
-    "build": "tsc && vite build",
+    "build": "npm run create-navbar && tsc && vite build",
     "serve": "vite preview",
     "create-navbar": "ts-node ./script/create-navbar-json.ts"
   },
