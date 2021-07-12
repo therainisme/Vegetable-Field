@@ -32,6 +32,7 @@ export function parse(target: string) {
     const infoArray = info.split('\r\n');
     const infoObject = {} as any;
     const keyArray = ["author", "chapter", "title"];
+    console.log(info);
     infoArray.forEach(x => {
         const keyValue = x.split(':');
         const key = keyValue[0];
