@@ -43,17 +43,25 @@ function Problem({ location }: any) {
         loading();
     }, [location.pathname]);
 
+
     const [resultMsg, setResultMsg] = useState<string>("");
     const [testTime, setTestTime] = useState<string>(new Date().toString());
     const handleOnTest = () => {
         try {
-            const testResult = eval(inputScript + '\r\n' + testScript);
+            const eva = (str: string) => {
+                return (0, eval)(str);
+            }
+            const testEnv = eva("'use strict'; "
+                + inputScript + '; (e) => eval(e);\r\n');
+            const judger = eva("(function(env) {'use strict'; " + testScript + "})");
+            const testResult = judger(testEnv);
             if (testResult === true && typeof testResult === "boolean") {
                 setResultMsg("Success!");
             } else if (testResult === false && typeof testResult === "boolean") {
                 setResultMsg("Wrong!");
             }
         } catch (e) {
+            console.error(e);
             setResultMsg("Unexpected error!");
         }
         setTestTime(new Date().toString());
