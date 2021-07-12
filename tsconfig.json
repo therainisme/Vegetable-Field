@@ -21,6 +21,7 @@
   },
   "include": [
     "./script",
-    "./src"
+    "./src",
+    "typed-css.d.ts" //配置的.d.ts文件
   ]
 }
