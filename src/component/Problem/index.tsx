@@ -20,8 +20,8 @@ import 'codemirror/addon/edit/closebrackets';
 import { requestUrlToFileUrl } from "../../utlis";
 
 
-const createMyConsole = `
-function createMyConsole() {
+const createNewConsole = `
+function createNewConsole() {
     function logger(...args) {
         outputs.push(Array.of(args));
     }
@@ -38,7 +38,7 @@ function createMyConsole() {
     return [myConsole, getOutputs];
 };
 
-const [newConsole, getOutputs] = createMyConsole();
+const [newConsole, getOutputs] = createNewConsole();
 const oldConsole = console;
 console = newConsole;
 `
@@ -72,15 +72,16 @@ function Problem({ location }: any) {
 
     const [resultMsg, setResultMsg] = useState<string>("");
     const [testTime, setTestTime] = useState<string>(new Date().toString());
+    const [outputs, setOutputs] = useState<string>(null!);
     const handleOnTest = () => {
 
         try {
-            const oldSb = console;
+            const oldConsole = console;
             const eva = (str: string) => {
                 return (0, eval)(str);
             }
             const testEnv = eva(`'use strict';
-                ${createMyConsole};
+                ${createNewConsole};
                 ${inputScript};
                 (e) => eval(e);\r\n`
             );
@@ -91,9 +92,9 @@ function Problem({ location }: any) {
                 )`
             );
             const [testResult, outputs] = judger(testEnv);
-            console = oldSb;
+            console = oldConsole;
 
-            console.log(testResult, outputs);
+            setOutputs(formatOutput(outputs));
 
             if (testResult === true && typeof testResult === "boolean") {
                 setResultMsg("Success!");
@@ -102,7 +103,7 @@ function Problem({ location }: any) {
             }
         } catch (e) {
             console.error(e);
-            setResultMsg("Unexpected error!");
+            setResultMsg("Unexpected error! <br/>" + e.stack.split("\n")[0]);
         }
         setTestTime(new Date().toString());
         setInputScript(inputScript);
@@ -154,12 +155,20 @@ function Problem({ location }: any) {
 
                         <button className="btn btn-success" type="button" data-toggle="modal" data-target="#staticBackdrop" style={{ margin: 20 }}>查看答案</button>
 
+                        {outputs ?
+                            <div className="alert alert-info" role="alert">
+                                <p><strong>{"[console]"}</strong></p>
+                                <span dangerouslySetInnerHTML={{__html: outputs}}/>
+                            </div> : ''
+                        }
+
                         {resultMsg ?
                             <div className={`alert ${resultMsg === "Success!" ? "alert-success" : "alert-danger"}`} role="alert">
                                 <p><strong>{testTime}</strong></p>
-                                <span>{resultMsg}</span>
+                                <span dangerouslySetInnerHTML={{__html: resultMsg}}/>
                             </div> : ''
                         }
+
 
                         <div className="modal fade" id="staticBackdrop" data-keyboard="false" tabIndex={"-1" as any} aria-labelledby="staticBackdropLabel" aria-hidden="true">
                             <div className="modal-dialog modal-dialog-centered">
@@ -188,3 +197,15 @@ function Problem({ location }: any) {
 
 export default Problem;
 
+function formatOutput(outputs: Array<Array<any>>): string {
+    let res = "";
+    for (const line of outputs) {
+        for (const array of line) {
+            for (const it of array) {
+                res = res + JSON.stringify(it) + " ";
+            }
+        }
+        res = res + "<br/>";
+    }
+    return res;
+}
