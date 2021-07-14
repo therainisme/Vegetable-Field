@@ -7,6 +7,7 @@ function NavBar() {
     useEffect(() => {
         axios.get('/chapter-data.json')
             .then((res) => {
+                console.info(res.data);
                 setChatperData(res.data);
             })
     }, []);
