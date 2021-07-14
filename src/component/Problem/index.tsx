@@ -19,6 +19,32 @@ import 'codemirror/addon/edit/closebrackets';
 
 import { requestUrlToFileUrl } from "../../utlis";
 
+
+const createMyConsole = `
+function createMyConsole() {
+    function logger(...args) {
+        outputs.push(Array.of(args));
+    }
+
+    let outputs = [];
+    const myConsole = {};
+
+    myConsole['log'] = logger;
+    myConsole['info'] = logger;
+    myConsole['warn'] = logger;
+    myConsole['error'] = logger;
+
+    const getOutputs = () => outputs;
+    return [myConsole, getOutputs];
+};
+
+const [newConsole, getOutputs] = createMyConsole();
+const oldConsole = console;
+console = newConsole;
+`
+
+
+
 function Problem({ location }: any) {
     const [content, setContent] = useState<string>(null!);
     const [title, setTitle] = useState<string>(null!);
@@ -47,14 +73,28 @@ function Problem({ location }: any) {
     const [resultMsg, setResultMsg] = useState<string>("");
     const [testTime, setTestTime] = useState<string>(new Date().toString());
     const handleOnTest = () => {
+
         try {
+            const oldSb = console;
             const eva = (str: string) => {
                 return (0, eval)(str);
             }
-            const testEnv = eva("'use strict'; "
-                + inputScript + '; (e) => eval(e);\r\n');
-            const judger = eva("(function(env) {'use strict'; " + testScript + "})");
-            const testResult = judger(testEnv);
+            const testEnv = eva(`'use strict';
+                ${createMyConsole};
+                ${inputScript};
+                (e) => eval(e);\r\n`
+            );
+            const judger = eva(`(function(env) {
+                'use strict'; 
+                const getOutputs = env('getOutputs');
+                return [(function(){${testScript}})(), getOutputs()];}
+                )`
+            );
+            const [testResult, outputs] = judger(testEnv);
+            console = oldSb;
+
+            console.log(testResult, outputs);
+
             if (testResult === true && typeof testResult === "boolean") {
                 setResultMsg("Success!");
             } else if (testResult === false && typeof testResult === "boolean") {
