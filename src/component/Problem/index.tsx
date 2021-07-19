@@ -19,31 +19,18 @@ import 'codemirror/addon/edit/closebrackets';
 
 import { requestUrlToFileUrl } from "../../utlis";
 
+import "ses";
 
-const createNewConsole = `
 function createNewConsole() {
-    function logger(...args) {
-        outputs.push(Array.of(args));
+    function logger(...args: any[]) {
+        outputs.push(args);
     }
 
-    let outputs = [];
-    const myConsole = {};
+    let outputs: any[] = [];
+    const myConsole = {log: logger, info: logger, warn: logger, error: logger};
 
-    myConsole['log'] = logger;
-    myConsole['info'] = logger;
-    myConsole['warn'] = logger;
-    myConsole['error'] = logger;
-
-    const getOutputs = () => outputs;
-    return [myConsole, getOutputs];
+    return [myConsole, outputs] as const;
 };
-
-const [newConsole, getOutputs] = createNewConsole();
-const oldConsole = console;
-console = newConsole;
-`
-
-
 
 function Problem({ location }: any) {
     const [content, setContent] = useState<string>(null!);
@@ -72,38 +59,34 @@ function Problem({ location }: any) {
 
     const [resultMsg, setResultMsg] = useState<string>("");
     const [testTime, setTestTime] = useState<string>(new Date().toString());
-    const [outputs, setOutputs] = useState<string>(null!);
+    const [outputs, setOutputs] = useState<string[]>(null!);
     const handleOnTest = () => {
 
         try {
-            const oldConsole = console;
-            const eva = (str: string) => {
-                return (0, eval)(str);
-            }
-            const testEnv = eva(`'use strict';
-                ${createNewConsole};
-                ${inputScript};
-                (e) => eval(e);\r\n`
-            );
-            const judger = eva(`(function(env) {
-                'use strict'; 
-                const getOutputs = env('getOutputs');
-                return [(function(){${testScript}})(), getOutputs()];}
-                )`
-            );
-            const [testResult, outputs] = judger(testEnv);
-            console = oldConsole;
+            lockdown();
+            const [fakeConsole, consoleOutputs] = createNewConsole();
+            const solution = {};
+            const sandbox = new Compartment({
+                console: harden(fakeConsole),
+                solution
+            });
+            sandbox.evaluate(inputScript);
+            const judgerSandbox = new Compartment({
+                console: fakeConsole,
+                solution
+            });
+            const testResult = judgerSandbox.evaluate(`(function(){\n${testScript}\n})()`);
 
-            setOutputs(formatOutput(outputs));
+            setOutputs(formatOutput(consoleOutputs));
 
-            if (testResult === true && typeof testResult === "boolean") {
+            if (testResult === true) {
                 setResultMsg("Success!");
-            } else if (testResult === false && typeof testResult === "boolean") {
+            } else {
                 setResultMsg("Wrong!");
             }
         } catch (e) {
             console.error(e);
-            setResultMsg("Unexpected error! <br/>" + e.stack.split("\n")[0]);
+            setResultMsg("Unexpected error!\n" + e.stack.split("\n")[0]);
         }
         setTestTime(new Date().toString());
         setInputScript(inputScript);
@@ -155,17 +138,17 @@ function Problem({ location }: any) {
 
                         <button className="btn btn-success" type="button" data-toggle="modal" data-target="#staticBackdrop" style={{ margin: 20 }}>查看答案</button>
 
-                        {outputs ?
+                        {outputs?.length ?
                             <div className="alert alert-info" role="alert">
                                 <p><strong>{"[console]"}</strong></p>
-                                <span dangerouslySetInnerHTML={{__html: outputs}}/>
+                                {outputs.map(msg => <div>{msg}</div>)}
                             </div> : ''
                         }
 
                         {resultMsg ?
                             <div className={`alert ${resultMsg === "Success!" ? "alert-success" : "alert-danger"}`} role="alert">
                                 <p><strong>{testTime}</strong></p>
-                                <span dangerouslySetInnerHTML={{__html: resultMsg}}/>
+                                {resultMsg.split('\n').map(msg => <div>{msg}</div>)}
                             </div> : ''
                         }
 
@@ -197,15 +180,14 @@ function Problem({ location }: any) {
 
 export default Problem;
 
-function formatOutput(outputs: Array<Array<any>>): string {
-    let res = "";
+function formatOutput(outputs: Array<Array<any>>): string[] {
+    let lines = [];
     for (const line of outputs) {
-        for (const array of line) {
-            for (const it of array) {
-                res = res + JSON.stringify(it) + " ";
-            }
+        let res = '';
+        for (const it of line) {
+            res = res + JSON.stringify(it) + " ";
         }
-        res = res + "<br/>";
+        lines.push(res);
     }
-    return res;
+    return lines;
 }
