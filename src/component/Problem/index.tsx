@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import MarkdownUtlis from "../../utlis/markdown-utlis";
 import { UnControlled as CodeMirror } from 'react-codemirror2'
 import 'highlight.js/styles/vs.css';
@@ -20,17 +20,7 @@ import 'codemirror/addon/edit/closebrackets';
 import { requestUrlToFileUrl } from "../../utlis";
 
 import "ses";
-
-function createNewConsole() {
-    function logger(...args: any[]) {
-        outputs.push(args);
-    }
-
-    let outputs: any[] = [];
-    const myConsole = {log: logger, info: logger, warn: logger, error: logger};
-
-    return [myConsole, outputs] as const;
-};
+import { WorkerClient } from "../../worker/judgerClient";
 
 function Problem({ location }: any) {
     const [content, setContent] = useState<string>(null!);
@@ -38,7 +28,8 @@ function Problem({ location }: any) {
     const [author, setAuthor] = useState<string>(null!);
     const [chapter, setChapter] = useState<string>(null!);
     const [testScript, setTestScript] = useState<string>(null!);
-    let [inputScript, setInputScript] = useState<string>(null!);
+    let [templateScript, setTemplateScript] = useState<string>(null!);
+    const inputScript = useRef<string>("");
 
     useEffect(() => {
         const loading = async () => {
@@ -50,46 +41,52 @@ function Problem({ location }: any) {
             setChapter(parseRes.chapter);
             setContent(parseRes.html);
             setTestScript(parseRes.script.test);
-            setInputScript(parseRes.script.template);
+            setTemplateScript(parseRes.script.template);
+            inputScript.current = parseRes.script.template;
         }
 
         loading();
     }, [location.pathname]);
 
+    const worker = useMemo(() => new WorkerClient(), []);
+    useEffect(() => {
+        return () => worker.close()
+    }, [worker]);
 
     const [resultMsg, setResultMsg] = useState<string>("");
     const [testTime, setTestTime] = useState<string>(new Date().toString());
     const [outputs, setOutputs] = useState<string[]>(null!);
-    const handleOnTest = () => {
-
-        try {
-            lockdown();
-            const [fakeConsole, consoleOutputs] = createNewConsole();
-            const solution = {};
-            const sandbox = new Compartment({
-                console: harden(fakeConsole),
-                solution
-            });
-            sandbox.evaluate(inputScript);
-            const judgerSandbox = new Compartment({
-                console: fakeConsole,
-                solution
-            });
-            const testResult = judgerSandbox.evaluate(`(function(){\n${testScript}\n})()`);
-
-            setOutputs(formatOutput(consoleOutputs));
-
-            if (testResult === true) {
-                setResultMsg("Success!");
-            } else {
-                setResultMsg("Wrong!");
-            }
-        } catch (e) {
-            console.error(e);
-            setResultMsg("Unexpected error!\n" + e.stack.split("\n")[0]);
-        }
+    const [running, setRunning] = useState(false);
+    const handleOnTest = async () => {
+        setRunning(true);
+        const timeout = setTimeout(() => {
+            worker.reset("Timeout");
+        }, 3000);
         setTestTime(new Date().toString());
-        setInputScript(inputScript);
+        setResultMsg("");
+        try {
+            const response = await worker.request({
+                inputScript: inputScript.current,
+                judgerScript: testScript
+            });
+            if (response.result == "error") {
+                console.error('judger error', response.error);
+                setResultMsg("Error!\n" + response.error);
+            } else {
+                if (response.result === "success") {
+                    setResultMsg("Success!");
+                } else {
+                    setResultMsg("Wrong!");
+                }
+            }
+            setOutputs(response.consoleOutputs);
+        } catch (error) {
+            console.error('judger error', error);
+            setResultMsg("Error!\n" + error);
+        } finally {
+            clearTimeout(timeout);
+            setRunning(false);
+        }
     }
 
     return (
@@ -110,8 +107,8 @@ function Problem({ location }: any) {
                         </div>
                         <div className={style.codeinputCard}>
                             <CodeMirror
+                                value={templateScript}
                                 className={style.codemirror}
-                                value={inputScript}
                                 options={{
                                     mode: "javascript",
                                     theme: "neo",
@@ -125,14 +122,16 @@ function Problem({ location }: any) {
                                     },
                                 }}
                                 onChange={(editor, data, value) => {
-                                    inputScript = value;
+                                    inputScript.current = value;
                                 }}
                             />
                         </div>
                         <button
                             className="btn btn-primary"
                             type="button"
-                            onClick={e => handleOnTest()}>
+                            disabled={running}
+                            onClick={e => { handleOnTest() }}>
+                            {running ? <span className="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span> : null}
                             测试
                         </button>
 
@@ -179,15 +178,3 @@ function Problem({ location }: any) {
 }
 
 export default Problem;
-
-function formatOutput(outputs: Array<Array<any>>): string[] {
-    let lines = [];
-    for (const line of outputs) {
-        let res = '';
-        for (const it of line) {
-            res = res + JSON.stringify(it) + " ";
-        }
-        lines.push(res);
-    }
-    return lines;
-}
