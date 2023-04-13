@@ -44,7 +44,7 @@ function run(req: JudgerRequest): JudgerResponse {
         result = testResult ? "success" : "wrong";
     } catch (e) {
         result = "error";
-        error = `${e}\n${e.stack.split('\n')[0]}`;
+        error = `${e}\n${e?.stack?.split('\n')[0]}`;
     }
     return {
         result,
